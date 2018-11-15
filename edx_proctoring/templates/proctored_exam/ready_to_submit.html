@@ -29,6 +29,11 @@
   {% endif %}
 </div>
 <script type="text/javascript">
+  var edx = edx || {};
+  edx.courseware = edx.courseware || {};
+  edx.courseware.proctored_exam = edx.courseware.proctored_exam || {};
+  edx.courseware.proctored_exam.configuredWorkerURL = "{{ backend_js_bundle }}";
+
   $('.exam-action-button').click(
     function(event) {
 
@@ -40,6 +45,18 @@
           var exam_id = $(this).data('exam-id');
           var action = $(this).data('action');
 
+          var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
+          new Promise((resolve) => {
+              var responseHandler = (e) => {
+                  if (e.data.type === "examEnded") {
+                      proctoringBackendWorker.removeEventListener('message', responseHandler);
+                      proctoringBackendWorker.terminate();
+                      resolve();
+                  }
+              };
+              proctoringBackendWorker.addEventListener('message', responseHandler);
+              proctoringBackendWorker.postMessage({ type: "endExam" });
+          }).then(() =>
           // Update the state of the attempt
           $.ajax({
             url: action_url,
@@ -51,11 +68,10 @@
               // Reloading page will reflect the new state of the attempt
               location.reload()
             }
-          });
+          }));
       } else {
         // TODO: better error message
         alert('There was an error shutting off the proctoring software.');
       }
   });
-  {{backend_js|safe}}
 </script>

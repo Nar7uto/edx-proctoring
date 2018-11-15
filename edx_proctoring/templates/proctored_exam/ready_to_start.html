@@ -56,16 +56,33 @@
 {% include 'proctored_exam/footer.html' %}
 
 <script type="text/javascript">
+  var edx = edx || {};
+  edx.courseware = edx.courseware || {};
+  edx.courseware.proctored_exam = edx.courseware.proctored_exam || {};
+  edx.courseware.proctored_exam.configuredWorkerURL = "{{ backend_js_bundle }}";
+
 
   $('.proctored-enter-exam').click(
     function(e) {
       e.preventDefault();
       e.stopPropagation();
 
-      var action_url = $(this).data('change-state-url');
-      var exam_id = $(this).data('exam-id');
-      var action = $(this).data('action');
+        var action_url = $(this).data('change-state-url');
+        var exam_id = $(this).data('exam-id');
+        var action = $(this).data('action');
 
+        var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
+        new Promise((resolve) => {
+            var responseHandler = (e) => {
+                if (e.data.type === "examStarted") {
+                    proctoringBackendWorker.removeEventListener('message', responseHandler);
+                    proctoringBackendWorker.terminate();
+                    resolve();
+                }
+            };
+            proctoringBackendWorker.addEventListener('message', responseHandler);
+            proctoringBackendWorker.postMessage({ type: "startExam" });
+        }).then(() =>
       // Update the state of the attempt
       $.ajax({
         url: action_url,
@@ -77,7 +94,7 @@
           // Reloading page will reflect the new state of the attempt
           location.reload();
         }
-      });
+      }));
     }
   );
 </script>

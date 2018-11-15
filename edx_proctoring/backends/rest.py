@@ -3,6 +3,9 @@ Base implementation of a REST backend, following the API documented in
 docs/backends.rst
 """
 import pkg_resources
+
+from webpack_loader.utils import get_files
+
 from edx_proctoring.backends.backend import ProctoringBackendProvider
 from edx_proctoring.models import ProctoredExamStudentAttemptStatus
 from edx_rest_api_client.client import OAuthAPIClient
@@ -59,10 +62,11 @@ class BaseRestProctoringProvider(ProctoringBackendProvider):
 
     def get_javascript(self):
         """
-        Returns the backend javascript to embed on each proctoring page
+        Returns the name of the javascript bundle into which the provider's JS will be loaded
         """
         package = self.__class__.__module__.split('.')[0]
-        return pkg_resources.resource_string(package, 'backend.js')
+        bundle_chunks = get_files(package, config="WORKERS")
+        return bundle_chunks[0]["url"]
 
     def get_software_download_url(self):
         """
