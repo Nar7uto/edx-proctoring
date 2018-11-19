@@ -182,6 +182,6 @@ class RESTBackendTests(TestCase):
         self.assertEqual(payload, new_payload)
 
     def test_get_javascript(self):
-        # A real backend would return real javascript from backend.js
+        # A real backend would return a real bundle name in webpack
         with self.assertRaises(IOError):
             self.provider.get_javascript()
