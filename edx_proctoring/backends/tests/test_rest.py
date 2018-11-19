@@ -181,13 +181,6 @@ class RESTBackendTests(TestCase):
         new_payload = self.provider.on_review_callback(attempt, payload)
         self.assertEqual(payload, new_payload)
 
-    @override_settings(WEBPACK_LOADER={
-        'WORKERS': {
-            'BUNDLE_DIR_NAME': 'bundles/',
-            # the test will not find this, which is fine
-            'STATS_FILE': 'webpack-worker-stats.json'
-        }
-    })
     def test_get_javascript(self):
         # A real backend would return a real bundle name in webpack
         with self.assertRaises(IOError):
