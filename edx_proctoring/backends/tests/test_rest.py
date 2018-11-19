@@ -5,7 +5,7 @@ import json
 
 import responses
 
-from django.test import TestCase, override_settings
+from django.test import TestCase
 
 from edx_proctoring.backends.rest import BaseRestProctoringProvider
 
