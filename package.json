@@ -1,7 +1,7 @@
 {
-  "name": "edx-proctoring",
+  "name": "@edx/edx-proctoring",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "edx_proctoring/static/index.js",
   "repository": {
     "type": "git",
     "url": "git://github.com/edx/edx-proctoring"
@@ -19,8 +19,5 @@
     "karma-sinon": "^1.0.5",
     "phantomjs-prebuilt": "^2.1.14",
     "sinon": "^3.2.1"
-  },
-  "dependencies": {
-    "mockprock": "file:../mockprock"
   }
 }

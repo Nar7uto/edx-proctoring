@@ -74,14 +74,14 @@
         var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
         new Promise((resolve) => {
             var responseHandler = (e) => {
-                if (e.data.type === "examStarted") {
+                if (e.data.type === "examAttemptStarted") {
                     proctoringBackendWorker.removeEventListener('message', responseHandler);
                     proctoringBackendWorker.terminate();
                     resolve();
                 }
             };
             proctoringBackendWorker.addEventListener('message', responseHandler);
-            proctoringBackendWorker.postMessage({ type: "startExam" });
+            proctoringBackendWorker.postMessage({ type: "startExamAttempt" });
         }).then(() =>
       // Update the state of the attempt
       $.ajax({
