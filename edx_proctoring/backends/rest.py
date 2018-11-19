@@ -2,8 +2,6 @@
 Base implementation of a REST backend, following the API documented in
 docs/backends.rst
 """
-import pkg_resources
-
 from webpack_loader.utils import get_files
 
 from edx_proctoring.backends.backend import ProctoringBackendProvider
