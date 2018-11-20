@@ -1970,7 +1970,7 @@ def get_student_view(user_id, course_id, content_id,
             is_proctored=context.get('is_proctored', False),
             is_practice_exam=context.get('is_practice_exam', False),
             due_date=context.get('due_date', None),
-            hide_after_due=context.get('hide_after_due', None),
+            hide_after_due=context.get('hide_after_due', False),
         )
         exam = get_exam_by_content_id(course_id, content_id)
 
