@@ -44,29 +44,39 @@
         var exam_id = $(this).data('exam-id');
         var action = $(this).data('action');
 
-        var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
-        new Promise(function(resolve) {
-            var responseHandler = function(e) {
-                if (e.data.type === "examAttemptEnded") {
-                    proctoringBackendWorker.removeEventListener('message', responseHandler);
-                    proctoringBackendWorker.terminate();
-                    resolve();
-                }
-            };
-            proctoringBackendWorker.addEventListener('message', responseHandler);
-            proctoringBackendWorker.postMessage({ type: "endExamAttempt" });
-        }).then(function() {
-                // Update the state of the attempt
-                return $.ajax({
-                    url: action_url,
-                    type: 'PUT',
-                    data: {
-                        action: action
-                    },
-                    success: function() {
-                        // Reloading page will reflect the new state of the attempt
-                        location.reload()
+        function workerPromise() {
+            var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
+            return new Promise(function(resolve) {
+                var responseHandler = function(e) {
+                    if (e.data.type === "examAttemptEnded") {
+                        proctoringBackendWorker.removeEventListener('message', responseHandler);
+                        proctoringBackendWorker.terminate();
+                        resolve();
                     }
-                })});
+                };
+                proctoringBackendWorker.addEventListener('message', responseHandler);
+                proctoringBackendWorker.postMessage({ type: "endExamAttempt" });
+            });
+        }
+        // Update the state of the attempt
+        function updateExamAttemptStatus() {
+            return $.ajax({
+                url: action_url,
+                type: 'PUT',
+                data: {
+                    action: action
+                },
+                success: function() {
+                    // Reloading page will reflect the new state of the attempt
+                    location.reload()
+                }
+            });
+        }
+        var shouldWaitForApplicationCallback = window.Worker && edx.courseware.proctored_exam.configuredWorkerURL;
+        if(shouldWaitForApplicationCallback) {
+            workerPromise().then(updateExamAttemptStatus);
+        } else {
+            updateExamAttemptStatus();
+        }
     });
 </script>

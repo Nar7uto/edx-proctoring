@@ -63,38 +63,49 @@
 
 
   $('.proctored-enter-exam').click(
-    function(e) {
-      e.preventDefault();
-      e.stopPropagation();
+      function(e) {
+          e.preventDefault();
+          e.stopPropagation();
 
-        var action_url = $(this).data('change-state-url');
-        var exam_id = $(this).data('exam-id');
-        var action = $(this).data('action');
+          var action_url = $(this).data('change-state-url');
+          var exam_id = $(this).data('exam-id');
+          var action = $(this).data('action');
 
-        var proctoringBackendWorker = new Worker(edx.courseware.proctored_exam.configuredWorkerURL);
-        new Promise((resolve) => {
-            var responseHandler = (e) => {
-                if (e.data.type === "examAttemptStarted") {
-                    proctoringBackendWorker.removeEventListener('message', responseHandler);
-                    proctoringBackendWorker.terminate();
-                    resolve();
-                }
-            };
-            proctoringBackendWorker.addEventListener('message', responseHandler);
-            proctoringBackendWorker.postMessage({ type: "startExamAttempt" });
-        }).then(() =>
-      // Update the state of the attempt
-      $.ajax({
-        url: action_url,
-        type: 'PUT',
-        data: {
-          action: action
-        },
-        success: function() {
-          // Reloading page will reflect the new state of the attempt
-          location.reload();
-        }
-      }));
-    }
+          function workerPromise() {
+              var proctoringBackendWorker = new window.Worker(edx.courseware.proctored_exam.configuredWorkerURL);
+              return new Promise((resolve) => {
+                  var responseHandler = (e) => {
+                      if (e.data.type === "examAttemptStarted") {
+                          proctoringBackendWorker.removeEventListener('message', responseHandler);
+                          proctoringBackendWorker.terminate();
+                          resolve();
+                      }
+                  };
+                  proctoringBackendWorker.addEventListener('message', responseHandler);
+                  proctoringBackendWorker.postMessage({ type: "startExamAttempt" });
+              })
+          };
+          function updateExamAttemptStatus() {
+              return $.ajax({
+                  url: action_url,
+                  type: 'PUT',
+                  data: {
+                      action: action
+                  },
+                  success: function() {
+                      // Reloading page will reflect the new state of the attempt
+                      window.location.reload();
+                  }
+              });
+          }
+
+          var shouldWaitForApplicationCallback = window.Worker && edx.courseware.proctored_exam.configuredWorkerURL;
+          if(shouldWaitForApplicationCallback) {
+              workerPromise().then(updateExamAttemptStatus);
+          } else {
+              updateExamAttemptStatus();
+          }
+
+      }
   );
 </script>

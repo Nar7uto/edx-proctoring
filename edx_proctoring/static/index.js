@@ -1,5 +1,5 @@
 export const handlerWrapper = (Handler) => {
-   let handler = new Handler();
+   let handler = new Handler({});
 
   self.addEventListener("message", (message) => {
     switch(message.data.type) {

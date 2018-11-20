@@ -182,6 +182,7 @@ class RESTBackendTests(TestCase):
         self.assertEqual(payload, new_payload)
 
     def test_get_javascript(self):
-        # A real backend would return a real bundle name in webpack
+        # A real backend would return a real bundle url from webpack
+        # but in this context we'll fail looking up webpack's stats file
         with self.assertRaises(IOError):
             self.provider.get_javascript()
