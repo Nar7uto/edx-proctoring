@@ -4,6 +4,7 @@ Tests for the REST backend
 import json
 
 import responses
+from mock import patch
 
 from django.test import TestCase
 
@@ -186,3 +187,9 @@ class RESTBackendTests(TestCase):
         # but in this context we'll fail looking up webpack's stats file
         with self.assertRaises(IOError):
             self.provider.get_javascript()
+
+    @patch('edx_proctoring.backends.rest.get_files')
+    def test_get_javascript_empty_bundle(self, get_files_mock):
+        get_files_mock.return_value = []
+        javascript_url = self.provider.get_javascript()
+        self.assertEqual(javascript_url, '')
