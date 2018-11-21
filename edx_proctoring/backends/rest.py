@@ -66,8 +66,7 @@ class BaseRestProctoringProvider(ProctoringBackendProvider):
         bundle_chunks = get_files(package, config="WORKERS")
         if bundle_chunks:
             return bundle_chunks[0]["url"]
-        else:
-            return ''
+        return ''
 
     def get_software_download_url(self):
         """
