@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git://github.com/edx/edx-proctoring"
   },
+  "files": [
+    "/edx_proctoring/static"
+  ],
   "devDependencies": {
     "gulp": "^3.9.0",
     "gulp-karma": "0.0.1",
@@ -19,5 +22,7 @@
     "karma-sinon": "^1.0.5",
     "phantomjs-prebuilt": "^2.1.14",
     "sinon": "^3.2.1"
-  }
+  },
+  "dependencies": {},
+  "license": "GNU Affero GPLv3"
 }
