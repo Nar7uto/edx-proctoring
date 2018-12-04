@@ -7,7 +7,7 @@ import time
 import uuid
 
 from webpack_loader.utils import get_files
-from webpack_loader.exceptions import BaseWebpackLoaderException
+from webpack_loader.exceptions import BaseWebpackLoaderException, WebpackBundleLookupError
 
 from edx_proctoring.backends.backend import ProctoringBackendProvider
 from edx_proctoring.statuses import ProctoredExamStudentAttemptStatus
@@ -80,8 +80,19 @@ class BaseRestProctoringProvider(ProctoringBackendProvider):
         bundle_chunks = ''
         try:
             bundle_chunks = get_files(package, config="WORKERS")
+        except WebpackBundleLookupError:
+            log.warning(
+                u'Could not find webpack bundle for proctoring backend %s.' +
+                u' Check whether webpack is configured to build such a bundle',
+                package
+            )
         except BaseWebpackLoaderException:
-            pass
+            log.warning(
+                u'Could not find webpack bundle for proctoring backend %s.',
+                package
+            )
+        # still necessary to check, since webpack_loader can be
+        # configured to ignore all matching packages
         if bundle_chunks:
             return bundle_chunks[0]["url"]
         return ''
